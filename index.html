@@ -1,1 +1,148 @@
-<h1>sdfsdf </h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>dazhuankuai </title>
+</head>
+<style>
+#Main{
+	width: 1050px;
+	height: 600px;
+	position:absolute;	
+	top:20px;
+	left:20px;
+	background:#ccc;
+
+}
+#ball{
+	width: 20px;
+	height: 20px;
+	position:absolute;
+	top:470px;
+	left: 520px;
+	border-radius: 100px;
+}
+#tiao{
+	width: 110px;
+	height:20px;
+	position:absolute;
+	top:550px;
+	left: 520px;
+	border-radius: 100px;
+}
+
+
+
+</style>
+<script src="leve.js"></script>
+<script src="jquery.js"></script>
+<body>
+<div id="Main">
+	<img src="ball.png" id="ball">
+	<img src="tiao.png" id="tiao">
+	
+	<canvas id="myCanvas" width="1050" height="500">
+	<img src="block.png" id="block">
+	</canvas>
+</div>	
+
+</body>
+<script>
+
+//canvas
+var canvas=document.getElementById('myCanvas');
+var ctx=canvas.getContext('2d');
+var ball=document.getElementById('ball');
+var tiao=document.getElementById('tiao');
+var blockimg=document.getElementById('block');
+
+
+
+
+var tiao_move=function(){
+	xs1=520;
+	xvright=20;
+	xvleft=20
+	ys1=550;
+	document.onkeydown=function (event) {
+		key=event.keyCode;	 
+	switch(key){
+		case 65:
+	        xs1-=xvleft;
+	        tiao.style.left=xs1+'px';
+	        break;
+	    case 68:
+	        xs1+=xvright;
+	        tiao.style.left=xs1+'px';
+	        break;
+			}
+		if(xs1+tiao.width>=1050){
+			xvright=0
+		}
+		else xvright=20
+
+		if(xs1<=0){
+			xvleft=0
+		}
+		else xvleft=20
+		}
+
+}
+
+tiao_move();
+
+var ball_move=function(){
+    b={
+	xs:520,
+	ys:470,
+	xv:10,
+	yv:10,
+	}
+	setInterval(function () {
+			b.xs+=b.xv
+			ball.style.left=b.xs+'px'
+			b.ys+=b.yv
+			ball.style.top=b.ys+'px'
+			if(b.ys>=580||b.ys<=0){
+			b.yv=-b.yv;
+			}
+			if(b.xs>=1030||b.xs<=0){
+			b.xv=-b.xv;
+			}
+
+			if(b.ys+ball.height>=ys1){
+				if(b.xs>=xs1&&b.xs+ball.width<=xs1+tiao.width){
+					b.yv=-b.yv
+					
+				}
+			}
+
+for(var i=0;i<=levels.length;i++){
+	ctx.drawImage(blockimg,levels[i][0],levels[i][1],60,20)}
+	
+			//砖块碰撞
+		if(b.ys<=40){
+			if(b.xs>=20+i*80 && b.xs+ball.width<=20+i*80+blockimg.width){
+				 		// alert(1)
+			ctx.clearRect(20+i*80,40,60,20)	
+				 }
+				 
+			}
+		
+		},100/3)	
+}
+
+ball_move();
+
+	
+
+var hit=function(){
+//alert(b.xs)
+
+}
+
+hit();
+
+
+</script>
+</html>
