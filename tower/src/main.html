@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>tower</title>
+</head>
+<script src="jquery.js"></script>
+<script src="bgarray.js"></script>
+<style>
+	#game{
+		border: 1px black solid;
+		width: 1100px;
+		height: 600px;
+		margin-left:200px;
+		margin-top: 50px; 
+		background: url(imgs/bg.jpg);
+		position: relative;
+
+	}
+
+
+	#info{
+		border: 1px black solid;
+		width:250px;
+		height: 500px;
+		position: absolute;
+		background:url(imgs/bg2.jpg);
+		margin-top: 50px;
+		margin-left:20px;
+	}
+
+	#main{
+		border: 1px black solid;
+		width: 440px;
+		height: 440px;
+		position: absolute;
+		margin-top: 70px;
+		margin-left: 400px;
+	}
+
+	#char{
+		position: absolute;
+		top:400px;
+		left:200px;
+	}
+
+	.key{
+		position: absolute;
+		font-size: 30px;
+		font-weight: bold;
+		margin-left:50px;
+		margin-top: 5px;
+	}
+	.kimg{
+		position:relative;
+		margin-left: -70px;
+
+	}
+	#test {
+		display:none;
+		width:100%;
+		height: 240px;
+		position: absolute;
+		background:#ccc;
+		opacity: 0.5;
+		line-height: 40px;
+	}
+</style>
+<body>
+	<div id="game">
+
+		<div id="info">
+			<h1 align="center" style="color:white"><span id="level"></span> 级</h1>
+			<p align="center" style="color:white">生命: <span id="life"></span></p>
+			<p align="center" style="color:white">攻击: <span id="attack"></span></p>
+			<p align="center" style="color:white">防御: <span id="defense"></span></p>
+			<p align="center" style="color:white">金币: <span id="money"></span></p>
+			<p align="center" style="color:white">经验: <span id="exp"></span></p>
+			<br>
+			<p align="center" style="color:white"><img src="imgs/yk.jpg" alt="" class="kimg"> <span id="yk" class="key"></span></p>
+			<p align="center" style="color:white"><img src="imgs/rk.jpg" alt="" class="kimg"> <span id="rk" class="key"></span></p>
+			<p align="center" style="color:white"><img src="imgs/bk.jpg" alt="" class="kimg"> <span id="bk" class="key"></span></p>
+
+		</div>
+	
+		<div id="main">
+			<img src="imgs/Battlers/Braver1.png" alt="" id="char">
+			<img src="imgs/06.png" alt="" style="position:absolute" id="m1">
+			<!-- <div id="test"><p>ssssssssssssssssss</p></div> -->
+			<canvas id="maincanvas" width="440px" height="440px"></canvas>
+		</div>
+
+	</div>
+</body>
+</html>
+<script>
+// $('#test').show()
+//canvas 
+var canvas=document.getElementById('maincanvas');
+	var cxt=canvas.getContext('2d');
+	var m1=new Image();
+	var img= new Image();
+	var img2= new Image();
+	var img3= new Image();
+	var img4= new Image();
+	img.src="imgs/bg3.jpg";
+	img2.src="imgs/bg2.jpg";
+	img3.src="imgs/yellowgate.jpg";
+	img4.src="imgs/redgate.jpg";
+
+var character={
+	 //属性
+	 lv:1,
+	 hp:1000,
+	 att:25,
+	 def:10,
+	 money:0,
+	 exp:0,
+	 yk:5,
+	 bk:0,
+	 rk:1,
+	 
+	 //人物坐标
+	 x:200,
+	 y:400,
+	 xv_right:40,
+	 xv_left:40,
+	 yv_up:40,
+	 yv_down:40,
+}
+
+
+var monster1={
+	//属性
+	hp:200,
+	exp:50,
+}
+
+
+function InforWrite(){
+	//各属性关系
+	character.lv=character.exp/100+1;
+	character.hp=(character.lv-1)*500+1000;
+	character.att=character.lv*10;
+	character.def=(character.lv-1)*5+10
+	
+	$('#level').html(character.lv);
+	$('#life').html(character.hp);
+	$('#attack').html(character.att);
+	$('#defense').html(character.def);
+	$('#money').html(character.money);
+	$('#exp').html(character.exp);
+	$('#yk').html(character.yk);
+	$('#bk').html(character.bk);
+	$('#rk').html(character.rk);
+}
+
+function DrawGame(){
+	$(img,img2,img3,img).load(function(){
+	//遍历bgarr数组
+		for(var i=0;i<bgarr.length;i++){
+			for(var j=0;j<bgarr[i].length;j++){
+				if(bgarr[i][j]==1){
+					cxt.drawImage(img2,j*40,i*40)
+				}else if(bgarr[i][j]==3){
+					cxt.drawImage(img3,j*40,i*40)
+				}else if(bgarr[i][j]==4){
+					cxt.drawImage(img4,j*40,i*40)
+				}else{
+					cxt.drawImage(img,j*40,i*40)
+				}
+			}
+		}
+	})
+}
+
+
+
+// function communication(){
+// }
+
+
+function Move(){
+	character.yv_down=0; //第一次按键之前定义速度为0
+  	$(document).keydown(function(event){
+		 k=event.keyCode;
+		switch(k){
+		  	case 37: 	//←
+		    character.x-=character.xv_left
+		  	$('#char').css({'left':character.x+'px'})
+		  	break;
+
+		  	case 38: 	//↑
+		  	character.y-=character.yv_up
+ 		  	$('#char').css({'top':character.y+'px'})
+		  	break;
+
+		  	case 39: 	//→
+		  	character.x+=character.xv_right
+		  	$('#char').css({'left':character.x+'px'})
+		  	break;
+
+		  	case 40: 	//↓
+		  	character.y+=character.yv_down
+		  	$('#char').css({'top':character.y+'px'})
+		  	break;
+		}
+		
+		document.title=character.x+'-'+character.y
+		//碰撞阻挡
+		Stop()
+		// 开门
+		DoOpen()
+
+		fight()
+
+  	})
+}
+
+
+
+function fight(){
+
+
+
+	hit = function(){
+
+
+	}
+
+
+
+
+	monster_x=Math.round($('#m1').position().left)	
+	monster_y=Math.round($('#m1').position().top)
+	if(monster_x+40==character.x){
+		character.xv_left=0
+		if(hit()){}
+	}
+	
+
+
+
+	}
+
+
+
+
+
+
+function DoOpen(){	
+	
+		
+	if(character.x==200&&character.y==360){
+		if(character.rk!=0){				
+			character.yv_up=40
+	
+		}else{
+			character.yv_up=0
+		}			
+	}
+	if(character.x==200&&character.y==280){
+		character.yv_down=40
+	}
+	if(character.x==200&&character.y==320){
+		$('#rk').html(parseInt(character.rk)-1)
+
+		cxt.drawImage(img2,200,320)
+	}
+
+	//————————————————————————————
+	
+	if(character.x==360&&character.y==280){
+		if(character.yk!=0){
+			character.yv_down=40
+		
+		}else{
+			character.yv_down=0
+		}
+	}
+	if(character.x==360&&character.y==360){
+		character.yv_up=40
+	}
+	if(character.x==360&&character.y==320){
+		$('#yk').html(parseInt(character.yk)-1)
+		// yknum=$('#yk').html()
+		cxt.drawImage(img2,360,320)
+	}
+	// alert(num)
+// ____________________________________________
+
+
+
+	if(character.x==160&&character.y==200){
+		if(character.yk!=0){
+			character.xv_right=40
+			
+		}else{
+		character.xv_right=0
+		}
+	}
+	if(character.x==240&&character.y==200){
+		character.xv_left=40
+	}
+	if(character.x==200&&character.y==200){
+		$('#yk').html(parseInt(character.yk)-1)
+		cxt.drawImage(img2,200,200)
+	}
+
+
+
+
+
+}
+
+
+
+
+
+
+
+function Stop(){	
+
+ 	// 往下不能走的情况
+	if((character.y>=400) || (character.y==0&&character.x!=400) || (character.y==120&&(character.x!=160&&character.x!=320&&character.x!=400)) || (character.y==200&&(character.x==280||character.x==320)) || (character.y==240&&(character.x==0||character.x==40||character.x==80)) ||(character.y==280)){
+	 	 character.yv_down=0
+	 }else{
+	 	character.yv_down=40
+	 }
+ 		
+ 	// 往上不能走的情况
+ 	if((character.y<=0) || (character.y==360&&character.x>=160) || (character.y==320&&character.x<=80) || (character.y==280&&(character.x!=160&&character.x!=400)) || (character.y==200&&(character.x!=160&&character.x!=320&&character.x!=400)) || (character.y==80&&character.x!=400) ){
+ 		character.yv_up=0
+ 	}else{
+ 		character.yv_up=40
+ 	}
+
+ 	// 往左不能走的情况
+ 	if((character.x<=0) || (character.x==400&&(character.y!=0&&character.y!=280&&character.y!=360&&character.y!=400)) || (character.x==320&&(character.y==160||character.y==360||character.y==400)) || (character.x==240&&(character.y==80||character.y==120||character.y==200)) || (character.x==160&&character.y!=0) ||((character.x!=40&&character.x!=80)&&character.y==320) ){
+ 		character.xv_left=0
+ 	}else{
+ 		character.xv_left=40
+ 	}
+
+ 	// 往右不能走的情况
+ 	if((character.x>=400) || (character.x==80&&character.y!=0) ||(character.x==160&&(character.y!=0&&character.y!=280&&character.y!=360&&character.y!=400)) ||(character.x==240&&(character.y==360||character.y==400)) ||(character.x==320&&(character.y>=80&&character.y<=200)) ||((character.x!=0&&character.x!=40)&&character.y==320) ){
+ 		character.xv_right=0
+ 	}else{
+ 		character.xv_right=40
+ 	}
+}
+
+
+
+
+//执行函数
+DrawGame();
+InforWrite();
+Move();
+// alert(Math.round($('#m1').position().left))	
+</script>
